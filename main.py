@@ -1,12 +1,32 @@
 import serial
+import serial.tools.list_ports as list_ports
 
 def main():
-    ser = serial.Serial("COM3", 9600, timeout=1)
+    ports = list(list_ports.comports())
+    print('Please select a port:')
+    p0arr = []
+    p1arr = []
+    for port in ports:
+        print(port[1])
+        p0arr.append(port[0])
+        p1arr.append(port[1])
+    selected = input()
+    try:
+        item = list(p0arr).index(selected)
+    except ValueError:
+        try:
+            item = list(p1arr).index(selected)
+        except ValueError:
+            print('Port does not exist!')
+            return
+    selected_port = ports[item][0]
+    ser = serial.Serial(selected_port, 9600, timeout=1)
     
     while True:
         tx = input("> ")
             
         if tx == "quit":
+            ser.close()
             break
 
         ser.write(tx.encode("utf-8"))
